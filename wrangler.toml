@@ -10,6 +10,9 @@ crons = ["*/30 * * * *"]
 # 目标 Worker 的名称
 TARGET_WORKER_NAME = "follownewfei"
 
+[observability]
+enabled = true
+
 # 注意：CLOUDFLARE_ACCOUNT_ID 和 CLOUDFLARE_API_TOKEN 应该作为 Secret 存储
 # 使用以下命令添加：
 # wrangler secret put CLOUDFLARE_ACCOUNT_ID
