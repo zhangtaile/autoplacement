@@ -10,16 +10,27 @@ export default {
     const utcHour = now.getUTCHours();
 
     /**
-     * 需求：
-     * 北京时间 9:00 - 16:00 -> gcp:europe-west3
-     * 其他时间 -> gcp:us-east1
+     * 需求 (北京时间 UTC+8):
+     * 00:00 - 08:00 -> 西欧 (gcp:europe-west1)
+     * 08:00 - 16:00 -> 美西 (gcp:us-west1)
+     * 16:00 - 00:00 -> 大洋洲 (gcp:australia-southeast1)
      * 
      * 换算为 UTC 时间 (北京时间 - 8 小时):
-     * 北京 09:00 = UTC 01:00
+     * 北京 00:00 = UTC 16:00 (前一天)
+     * 北京 08:00 = UTC 00:00
      * 北京 16:00 = UTC 08:00
      */
-    const isWorkingHours = utcHour >= 1 && utcHour < 8;
-    const targetRegion = isWorkingHours ? 'gcp:europe-west3' : 'gcp:us-east1';
+    let targetRegion = '';
+    if (utcHour >= 16) {
+      // 北京 00:00 - 08:00
+      targetRegion = 'gcp:europe-west1';
+    } else if (utcHour < 8) {
+      // 北京 08:00 - 16:00
+      targetRegion = 'gcp:us-west1';
+    } else {
+      // 北京 16:00 - 00:00
+      targetRegion = 'gcp:australia-southeast1';
+    }
 
     console.log(`Current UTC Time: ${now.toISOString()}, Target Region: ${targetRegion}`);
 
