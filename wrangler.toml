@@ -2,9 +2,9 @@ name = "autoplacement"
 main = "src/index.ts"
 compatibility_date = "2024-05-02"
 
-# 定时任务配置：每 30 分钟检查一次
+# 定时任务配置：在北京时间 09:05 和 16:05 执行切换
 [triggers]
-crons = ["*/30 * * * *"]
+crons = ["5 1 * * *", "5 8 * * *"] 
 
 [vars]
 # 目标 Worker 的名称
