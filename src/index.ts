@@ -55,15 +55,21 @@ export default {
 
       // 3. 执行更新
       console.log(`Updating placement to ${targetRegion}...`);
+      
+      const formData = new FormData();
+      formData.append('settings', JSON.stringify({
+        placement: {
+          mode: 'targeted',
+          region: targetRegion
+        }
+      }));
+
       const patchResponse = await fetch(baseUrl, {
         method: 'PATCH',
-        headers,
-        body: JSON.stringify({
-          placement: {
-            mode: 'targeted',
-            region: targetRegion
-          }
-        })
+        headers: {
+          'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
+        },
+        body: formData
       });
 
       if (!patchResponse.ok) {
