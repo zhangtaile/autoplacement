@@ -1,6 +1,7 @@
 name = "autoplacement"
 main = "src/index.ts"
 compatibility_date = "2024-05-02"
+workers_dev = false
 
 # 定时任务配置：在北京时间 09:05 和 16:05 执行切换
 [triggers]
