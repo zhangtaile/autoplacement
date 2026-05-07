@@ -24,46 +24,12 @@ export default {
     console.log(`Current UTC Time: ${now.toISOString()}, Target Region: ${targetRegion}`);
 
     const baseUrl = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${env.TARGET_WORKER_NAME}/settings`;
-    const headers = {
-      'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
-      'Content-Type': 'application/json',
-    };
 
     try {
-      // 1. 获取当前配置
-      console.log(`Checking current placement for ${env.TARGET_WORKER_NAME}...`);
-      const getResponse = await fetch(baseUrl, { headers });
-      
-      if (!getResponse.ok) {
-        const errorText = await getResponse.text();
-        throw new Error(`Failed to fetch settings: ${getResponse.status} ${errorText}`);
-      }
-
-      const config: any = await getResponse.json();
-      const currentPlacement = config.result?.placement;
-
-      console.log(`Current placement object: ${JSON.stringify(currentPlacement)}`);
-      
-      // 根据日志显示，如果设置了 region，返回值可能会出现在 currentPlacement.target 或 currentPlacement.region
-      // 我们优先检查 region 字符串，如果不存在则判断是否需要强制更新
-      const currentRegion = currentPlacement?.region;
-      console.log(`Current placement: mode=${currentPlacement?.mode}, region=${currentRegion}`);
-
-      // 2. 判断是否需要更新
-      // 由于 API 返回的 'target' 可能是不直观的 ID，我们通过比较 mode 和 region 字符串来决定
-      if (
-        currentPlacement?.mode === 'targeted' && 
-        currentRegion === targetRegion
-      ) {
-        console.log(`Placement is already set to ${targetRegion}. Skipping update.`);
-        return;
-      }
-
-      // 3. 执行更新
-      console.log(`Updating placement to ${targetRegion}...`);
+      // 执行更新 (直接无脑覆盖，确保状态符合预期)
+      console.log(`Setting placement to ${targetRegion} for ${env.TARGET_WORKER_NAME}...`);
       
       const formData = new FormData();
-      // 明确设置 mode 为 targeted 并指定 region
       formData.append('settings', JSON.stringify({
         placement: {
           mode: 'targeted',
@@ -84,7 +50,7 @@ export default {
         throw new Error(`Failed to update settings: ${patchResponse.status} ${errorText}`);
       }
 
-      console.log(`Successfully updated placement for ${env.TARGET_WORKER_NAME} to ${targetRegion}.`);
+      console.log(`Successfully updated placement to ${targetRegion}.`);
     } catch (error) {
       console.error(`Error in autoplacement worker:`, error);
     }
