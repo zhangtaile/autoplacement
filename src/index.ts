@@ -43,12 +43,17 @@ export default {
       const currentPlacement = config.result?.placement;
 
       console.log(`Current placement object: ${JSON.stringify(currentPlacement)}`);
-      console.log(`Current placement: mode=${currentPlacement?.mode}, region=${currentPlacement?.region}`);
+      
+      // 根据日志显示，如果设置了 region，返回值可能会出现在 currentPlacement.target 或 currentPlacement.region
+      // 我们优先检查 region 字符串，如果不存在则判断是否需要强制更新
+      const currentRegion = currentPlacement?.region;
+      console.log(`Current placement: mode=${currentPlacement?.mode}, region=${currentRegion}`);
 
       // 2. 判断是否需要更新
+      // 由于 API 返回的 'target' 可能是不直观的 ID，我们通过比较 mode 和 region 字符串来决定
       if (
         currentPlacement?.mode === 'targeted' && 
-        currentPlacement?.region === targetRegion
+        currentRegion === targetRegion
       ) {
         console.log(`Placement is already set to ${targetRegion}. Skipping update.`);
         return;
@@ -58,6 +63,7 @@ export default {
       console.log(`Updating placement to ${targetRegion}...`);
       
       const formData = new FormData();
+      // 明确设置 mode 为 targeted 并指定 region
       formData.append('settings', JSON.stringify({
         placement: {
           mode: 'targeted',
