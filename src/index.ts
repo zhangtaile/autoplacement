@@ -42,6 +42,7 @@ export default {
       const config: any = await getResponse.json();
       const currentPlacement = config.result?.placement;
 
+      console.log(`Current placement object: ${JSON.stringify(currentPlacement)}`);
       console.log(`Current placement: mode=${currentPlacement?.mode}, region=${currentPlacement?.region}`);
 
       // 2. 判断是否需要更新
