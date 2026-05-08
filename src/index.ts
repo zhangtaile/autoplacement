@@ -7,29 +7,22 @@ interface Env {
 export default {
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
     const now = new Date();
-    const utcHour = now.getUTCHours();
+    // 使用 UTC 分钟数以获得更高精度 (CST = UTC + 8)
+    const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
 
     /**
-     * 需求 (北京时间 UTC+8):
-     * 00:00 - 08:00 -> 西欧 (gcp:europe-west1)
-     * 08:00 - 16:00 -> 美西 (gcp:us-west1)
-     * 16:00 - 00:00 -> 大洋洲 (gcp:australia-southeast1)
-     * 
-     * 换算为 UTC 时间 (北京时间 - 8 小时):
-     * 北京 00:00 = UTC 16:00 (前一天)
-     * 北京 08:00 = UTC 00:00
-     * 北京 16:00 = UTC 08:00
+     * 需求 (北京时间 CST):
+     * 21:30 - 05:30 -> 大洋洲 (gcp:australia-southeast1) | UTC 13:30 - 21:30 (810 - 1290 min)
+     * 05:30 - 13:00 -> 欧洲   (gcp:europe-west3)         | UTC 21:30 - 05:00 (1290 - 300 min)
+     * 13:00 - 21:30 -> 美国   (gcp:us-central1)          | UTC 05:00 - 13:30 (300 - 810 min)
      */
     let targetRegion = '';
-    if (utcHour >= 16) {
-      // 北京 00:00 - 08:00
-      targetRegion = 'gcp:europe-west1';
-    } else if (utcHour < 8) {
-      // 北京 08:00 - 16:00
-      targetRegion = 'gcp:us-west1';
-    } else {
-      // 北京 16:00 - 00:00
+    if (utcMinutes >= 810 && utcMinutes < 1290) {
       targetRegion = 'gcp:australia-southeast1';
+    } else if (utcMinutes >= 300 && utcMinutes < 810) {
+      targetRegion = 'gcp:us-central1';
+    } else {
+      targetRegion = 'gcp:europe-west3';
     }
 
     console.log(`Current UTC Time: ${now.toISOString()}, Target Region: ${targetRegion}`);
