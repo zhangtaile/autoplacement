@@ -11,18 +11,19 @@ export default {
     const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
 
     /**
-     * 需求 (北京时间 CST):
-     * 21:30 - 05:30 -> 大洋洲 (gcp:australia-southeast1) | UTC 13:30 - 21:30 (810 - 1290 min)
-     * 05:30 - 13:00 -> 欧洲   (gcp:europe-west3)         | UTC 21:30 - 05:00 (1290 - 300 min)
-     * 13:00 - 21:30 -> 美国   (gcp:us-central1)          | UTC 05:00 - 13:30 (300 - 810 min)
+     * 需求分布:
+     * 北京时间 (CST) | UTC 时间        | 区域 (GCP Region)           | 当地时间 (Local)
+     * 06:30 - 14:00 | 22:30 - 06:00 | europe-west3 (法兰克福)      | 23:30 - 07:00 (CET)
+     * 其它时间      | 其它时间      | us-central1 (爱荷华)         | -
      */
     let targetRegion = '';
-    if (utcMinutes >= 810 && utcMinutes < 1290) {
-      targetRegion = 'gcp:australia-southeast1';
-    } else if (utcMinutes >= 300 && utcMinutes < 810) {
-      targetRegion = 'gcp:us-central1';
-    } else {
+    // 06:30 CST = 22:30 UTC = 1350 min
+    // 14:00 CST = 06:00 UTC = 360 min
+    // 跨越午夜: 22:30 (1350) -> 24:00 (1440) -> 06:00 (360)
+    if (utcMinutes >= 1350 || utcMinutes < 360) {
       targetRegion = 'gcp:europe-west3';
+    } else {
+      targetRegion = 'gcp:us-central1';
     }
 
     console.log(`Current UTC Time: ${now.toISOString()}, Target Region: ${targetRegion}`);

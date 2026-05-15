@@ -3,9 +3,9 @@ main = "src/index.ts"
 compatibility_date = "2024-05-02"
 workers_dev = false
 
-# 定时任务配置：在北京时间 21:35, 05:35, 13:05 执行切换
+# 定时任务配置：在北京时间 06:35 和 14:05 执行切换
 [triggers]
-crons = ["35 13 * * *", "35 21 * * *", "5 5 * * *"] 
+crons = ["35 22 * * *", "5 6 * * *"] 
 
 [vars]
 # 目标 Worker 的名称
