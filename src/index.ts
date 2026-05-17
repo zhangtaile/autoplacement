@@ -2,10 +2,16 @@ interface Env {
   CLOUDFLARE_ACCOUNT_ID: string;
   CLOUDFLARE_API_TOKEN: string;
   TARGET_WORKER_NAME: string;
+  ENABLE_AUTOPLACEMENT: boolean;
 }
 
 export default {
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
+    if (env.ENABLE_AUTOPLACEMENT === false) {
+      console.log("Autoplacement is disabled via ENABLE_AUTOPLACEMENT variable. Skipping.");
+      return;
+    }
+
     const now = new Date();
     // 使用 UTC 分钟数以获得更高精度 (CST = UTC + 8)
     const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
@@ -63,6 +69,9 @@ export default {
 
   // 方便手动触发测试
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+    if (env.ENABLE_AUTOPLACEMENT === false) {
+      return new Response("Autoplacement is currently DISABLED. No action taken.", { status: 200 });
+    }
     await this.scheduled({} as any, env, ctx);
     return new Response("Placement check executed manually.");
   }
